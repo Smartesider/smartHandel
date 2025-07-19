@@ -1,8 +1,8 @@
-import Stripe from 'stripe';
+const Stripe = require('stripe');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', 'https://smartesider.no');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -32,16 +32,18 @@ export default async function handler(req, res) {
           },
         ],
         mode: 'payment',
-        success_url: 'https://smartesider.no/success',
-        cancel_url: 'https://smartesider.no/cancel',
+        success_url: 'https://smartesider.no/success.html',
+        cancel_url: 'https://smartesider.no/cancel.html',
+        customer_email: customerDetails.email,
       });
 
       res.status(200).json({ url: session.url });
     } catch (error) {
+      console.error('Stripe error:', error);
       res.status(500).json({ error: 'Failed to create checkout session' });
     }
   } else {
     res.setHeader('Allow', ['POST', 'OPTIONS']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
-}
+};
