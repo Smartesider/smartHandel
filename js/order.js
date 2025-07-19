@@ -23,42 +23,96 @@ class OrderSystem {
               <h3>Valgt pakke</h3>
               <div class="package-details">
                 <span id="selected-package">Standard bedrift</span>
-                <span id="selected-price">kr 9,990</span>
+                <span id="selected-price-display">kr 9,990</span>
+              </div>
+            </div>
+
+            <!-- Price Overview Section -->
+            <div class="price-overview">
+              <h4>Prisoversikt</h4>
+              <div class="price-row">
+                <span>Pris (eks. mva):</span>
+                <span id="pris-eks-mva">0,-</span>
+              </div>
+              <div class="price-row">
+                <span>MVA (25%):</span>
+                <span id="mva-belop">0,-</span>
+              </div>
+              <div class="price-row total-row">
+                <span>Total (inkl. mva):</span>
+                <span id="total-pris">0,-</span>
               </div>
             </div>
 
             <form id="customer-form">
+              <!-- Contact Person -->
               <div class="form-group">
-                <label for="full-name">Fullt navn *</label>
-                <input type="text" id="full-name" name="fullName" required>
+                <label for="kontaktperson">Kontaktperson *</label>
+                <input type="text" id="kontaktperson" name="kontaktperson" required>
               </div>
 
+              <!-- Phone -->
               <div class="form-group">
-                <label for="company-name">Firmanavn</label>
-                <input type="text" id="company-name" name="company">
+                <label for="telefon">Telefon *</label>
+                <input type="tel" id="telefon" name="telefon" required>
               </div>
 
+              <!-- Email -->
               <div class="form-group">
-                <label for="org-number">Organisasjonsnummer</label>
-                <input type="text" id="org-number" name="orgNumber">
+                <label for="epost">E-post *</label>
+                <input type="email" id="epost" name="epost" required>
               </div>
 
+              <!-- Company Name -->
               <div class="form-group">
-                <label for="email">E-post *</label>
-                <input type="email" id="email" name="email" required>
+                <label for="firmanavn">Firmanavn *</label>
+                <input type="text" id="firmanavn" name="firmanavn" required>
+              </div>
+
+              <!-- Organization Number -->
+              <div class="form-group">
+                <label for="orgnummer">Organisasjonsnummer *</label>
+                <input type="text" id="orgnummer" name="orgnummer" required pattern="[0-9]{9}" placeholder="123456789">
+              </div>
+
+              <!-- Address -->
+              <div class="form-group">
+                <label for="adresse">Adresse *</label>
+                <input type="text" id="adresse" name="adresse" required>
+              </div>
+
+              <!-- Postal Code -->
+              <div class="form-group">
+                <label for="postnr">Postnr *</label>
+                <input type="text" id="postnr" name="postnr" required pattern="[0-9]{4}" placeholder="0123">
+              </div>
+
+              <!-- City -->
+              <div class="form-group">
+                <label for="poststed">Poststed *</label>
+                <input type="text" id="poststed" name="poststed" required>
+              </div>
+
+              <!-- Comment -->
+              <div class="form-group">
+                <label for="kommentar">Kommentar</label>
+                <textarea id="kommentar" name="kommentar" rows="3" placeholder="Eventuelle spesielle ønsker eller kommentarer..."></textarea>
               </div>
             </form>
 
             <div class="payment-buttons">
               <button id="pay-with-stripe" class="btn btn-primary">
+                <span class="btn-icon">💳</span>
                 Betal med kort
               </button>
               <button id="request-invoice" class="btn btn-secondary">
+                <span class="btn-icon">📄</span>
                 Send faktura
               </button>
             </div>
 
             <div id="loading" class="loading hidden">
+              <div class="spinner"></div>
               <p>Behandler bestilling...</p>
             </div>
 
@@ -81,11 +135,12 @@ class OrderSystem {
           left: 0;
           width: 100%;
           height: 100%;
-          background: rgba(0, 0, 0, 0.5);
+          background: rgba(0, 0, 0, 0.6);
           display: flex;
           justify-content: center;
           align-items: center;
           z-index: 1000;
+          backdrop-filter: blur(4px);
         }
 
         .order-modal.hidden {
@@ -94,131 +149,250 @@ class OrderSystem {
 
         .modal-content {
           background: white;
-          border-radius: 8px;
+          border-radius: 12px;
           padding: 0;
-          max-width: 500px;
-          width: 90%;
+          max-width: 600px;
+          width: 95%;
           max-height: 90vh;
           overflow-y: auto;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .modal-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 20px;
-          border-bottom: 1px solid #eee;
+          padding: 25px 30px;
+          border-bottom: 1px solid #e2e8f0;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border-radius: 12px 12px 0 0;
         }
 
         .modal-header h2 {
           margin: 0;
-          color: #333;
+          font-size: 1.5rem;
+          font-weight: 600;
         }
 
         .close-modal {
-          background: none;
+          background: rgba(255, 255, 255, 0.2);
           border: none;
           font-size: 24px;
           cursor: pointer;
-          color: #666;
+          color: white;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background-color 0.3s;
+        }
+
+        .close-modal:hover {
+          background: rgba(255, 255, 255, 0.3);
         }
 
         .modal-body {
-          padding: 20px;
+          padding: 30px;
         }
 
         .order-summary {
-          background: #f8f9fa;
-          padding: 15px;
-          border-radius: 6px;
-          margin-bottom: 20px;
+          background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+          padding: 20px;
+          border-radius: 8px;
+          margin-bottom: 25px;
+          border: 1px solid #cbd5e0;
         }
 
         .order-summary h3 {
-          margin: 0 0 10px 0;
-          color: #333;
+          margin: 0 0 15px 0;
+          color: #2d3748;
+          font-size: 1.1rem;
+          font-weight: 600;
         }
 
         .package-details {
           display: flex;
           justify-content: space-between;
-          font-weight: bold;
+          font-weight: 600;
+          color: #4a5568;
+        }
+
+        .price-overview {
+          background: #f7fafc;
+          padding: 20px;
+          border-radius: 8px;
+          margin-bottom: 25px;
+          border: 1px solid #e2e8f0;
+        }
+
+        .price-overview h4 {
+          margin: 0 0 15px 0;
+          color: #2d3748;
+          font-size: 1.1rem;
+          font-weight: 600;
+        }
+
+        .price-row {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 8px;
+          color: #4a5568;
+        }
+
+        .price-row.total-row {
+          margin-top: 15px;
+          padding-top: 15px;
+          border-top: 2px solid #cbd5e0;
+          font-weight: 700;
+          font-size: 1.1rem;
+          color: #2d3748;
         }
 
         .form-group {
-          margin-bottom: 15px;
+          margin-bottom: 20px;
         }
 
         .form-group label {
           display: block;
-          margin-bottom: 5px;
-          font-weight: bold;
-          color: #333;
+          margin-bottom: 8px;
+          font-weight: 600;
+          color: #2d3748;
+          font-size: 0.95rem;
         }
 
-        .form-group input {
+        .form-group input,
+        .form-group textarea {
           width: 100%;
-          padding: 10px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
+          padding: 12px 16px;
+          border: 2px solid #e2e8f0;
+          border-radius: 8px;
           font-size: 16px;
           box-sizing: border-box;
+          transition: border-color 0.3s, box-shadow 0.3s;
+          font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+          resize: vertical;
+          min-height: 80px;
         }
 
         .payment-buttons {
           display: flex;
-          gap: 10px;
-          margin-top: 20px;
+          gap: 15px;
+          margin-top: 30px;
         }
 
         .btn {
           flex: 1;
-          padding: 12px 20px;
+          padding: 16px 24px;
           border: none;
-          border-radius: 6px;
+          border-radius: 8px;
           font-size: 16px;
+          font-weight: 600;
           cursor: pointer;
-          transition: background-color 0.3s;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          min-height: 56px;
         }
 
         .btn-primary {
-          background: #007bff;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
+          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
         .btn-primary:hover {
-          background: #0056b3;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
         }
 
         .btn-secondary {
-          background: #6c757d;
+          background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
           color: white;
+          box-shadow: 0 4px 15px rgba(113, 128, 150, 0.4);
         }
 
         .btn-secondary:hover {
-          background: #545b62;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(113, 128, 150, 0.6);
+        }
+
+        .btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none !important;
+        }
+
+        .btn-icon {
+          font-size: 18px;
         }
 
         .loading {
           text-align: center;
-          color: #666;
+          color: #718096;
+          padding: 20px;
+        }
+
+        .spinner {
+          border: 3px solid #e2e8f0;
+          border-top: 3px solid #667eea;
+          border-radius: 50%;
+          width: 30px;
+          height: 30px;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
 
         .error-message {
-          background: #f8d7da;
-          color: #721c24;
-          padding: 10px;
-          border-radius: 4px;
-          margin-top: 10px;
+          background: #fed7d7;
+          color: #9b2c2c;
+          padding: 15px;
+          border-radius: 8px;
+          margin-top: 15px;
+          border: 1px solid #feb2b2;
+          font-weight: 500;
         }
 
         .hidden {
           display: none;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
+          .modal-content {
+            width: 98%;
+            margin: 10px;
+          }
+
+          .modal-body {
+            padding: 20px;
+          }
+
           .payment-buttons {
             flex-direction: column;
+          }
+
+          .modal-header {
+            padding: 20px;
           }
         }
       </style>
@@ -237,7 +411,10 @@ class OrderSystem {
 
     // Modal close listeners
     document.addEventListener('click', (e) => {
-      if (e.target.classList.contains('close-modal') || e.target.id === 'order-modal') {
+      if (e.target.classList.contains('close-modal')) {
+        this.closeModal();
+      }
+      if (e.target.id === 'order-modal') {
         this.closeModal();
       }
     });
@@ -261,15 +438,30 @@ class OrderSystem {
 
   openModal(button) {
     const packageName = button.dataset.package;
-    const price = parseInt(button.dataset.price);
+    const priceExVat = parseInt(button.dataset.price);
 
+    // Calculate VAT and total
+    const vatAmount = Math.round(priceExVat * 0.25);
+    const totalPrice = priceExVat + vatAmount;
+
+    // Update display
     document.getElementById('selected-package').textContent = packageName;
-    document.getElementById('selected-price').textContent = `kr ${price.toLocaleString()}`;
+    document.getElementById('selected-price-display').textContent = `kr ${totalPrice.toLocaleString()}`;
+    
+    // Update price breakdown
+    document.getElementById('pris-eks-mva').textContent = `kr ${priceExVat.toLocaleString()}`;
+    document.getElementById('mva-belop').textContent = `kr ${vatAmount.toLocaleString()}`;
+    document.getElementById('total-pris').textContent = `kr ${totalPrice.toLocaleString()}`;
     
     document.getElementById('order-modal').classList.remove('hidden');
     
     // Store current order data
-    this.currentOrder = { packageName, price };
+    this.currentOrder = { 
+      packageName, 
+      priceExVat, 
+      vatAmount, 
+      totalPrice 
+    };
   }
 
   closeModal() {
@@ -288,24 +480,58 @@ class OrderSystem {
     const formData = new FormData(form);
     
     return {
-      fullName: formData.get('fullName'),
-      company: formData.get('company'),
-      orgNumber: formData.get('orgNumber'),
-      email: formData.get('email'),
+      contactPerson: formData.get('kontaktperson'),
+      phone: formData.get('telefon'),
+      email: formData.get('epost'),
+      companyName: formData.get('firmanavn'),
+      orgNumber: formData.get('orgnummer'),
+      address: formData.get('adresse'),
+      zipCode: formData.get('postnr'),
+      city: formData.get('poststed'),
+      comment: formData.get('kommentar') || ''
     };
   }
 
   validateForm() {
     const customerDetails = this.getCustomerDetails();
     
-    if (!customerDetails.fullName || !customerDetails.email) {
-      this.showError('Vennligst fyll ut alle obligatoriske felt.');
-      return false;
+    // Check required fields
+    const requiredFields = [
+      { field: 'contactPerson', label: 'Kontaktperson' },
+      { field: 'phone', label: 'Telefon' },
+      { field: 'email', label: 'E-post' },
+      { field: 'companyName', label: 'Firmanavn' },
+      { field: 'orgNumber', label: 'Organisasjonsnummer' },
+      { field: 'address', label: 'Adresse' },
+      { field: 'zipCode', label: 'Postnr' },
+      { field: 'city', label: 'Poststed' }
+    ];
+
+    for (const { field, label } of requiredFields) {
+      if (!customerDetails[field] || customerDetails[field].trim() === '') {
+        this.showError(`Vennligst fyll ut: ${label}`);
+        return false;
+      }
     }
 
+    // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(customerDetails.email)) {
       this.showError('Vennligst oppgi en gyldig e-postadresse.');
+      return false;
+    }
+
+    // Validate organization number (9 digits)
+    const orgNumberRegex = /^[0-9]{9}$/;
+    if (!orgNumberRegex.test(customerDetails.orgNumber)) {
+      this.showError('Organisasjonsnummer må bestå av 9 siffer.');
+      return false;
+    }
+
+    // Validate postal code (4 digits)
+    const zipCodeRegex = /^[0-9]{4}$/;
+    if (!zipCodeRegex.test(customerDetails.zipCode)) {
+      this.showError('Postnummer må bestå av 4 siffer.');
       return false;
     }
 
@@ -316,15 +542,24 @@ class OrderSystem {
     const errorElement = document.getElementById('error-message');
     errorElement.textContent = message;
     errorElement.classList.remove('hidden');
+    errorElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   showLoading() {
     document.getElementById('loading').classList.remove('hidden');
     document.getElementById('error-message').classList.add('hidden');
+    
+    // Disable buttons
+    document.getElementById('pay-with-stripe').disabled = true;
+    document.getElementById('request-invoice').disabled = true;
   }
 
   hideLoading() {
     document.getElementById('loading').classList.add('hidden');
+    
+    // Re-enable buttons
+    document.getElementById('pay-with-stripe').disabled = false;
+    document.getElementById('request-invoice').disabled = false;
   }
 
   async handleStripePayment() {
@@ -335,20 +570,25 @@ class OrderSystem {
     try {
       const customerDetails = this.getCustomerDetails();
       
+      const orderData = {
+        package: this.currentOrder.packageName,
+        priceExVat: this.currentOrder.priceExVat,
+        vatAmount: this.currentOrder.vatAmount,
+        totalPrice: this.currentOrder.totalPrice,
+        customer: customerDetails
+      };
+
       const response = await fetch(`${this.apiBaseUrl}/create-stripe-session`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          packageName: this.currentOrder.packageName,
-          price: this.currentOrder.price,
-          customerDetails,
-        }),
+        body: JSON.stringify(orderData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create payment session');
+        const errorText = await response.text();
+        throw new Error(`Failed to create payment session: ${errorText}`);
       }
 
       const data = await response.json();
@@ -374,20 +614,25 @@ class OrderSystem {
     try {
       const customerDetails = this.getCustomerDetails();
       
+      const orderData = {
+        package: this.currentOrder.packageName,
+        priceExVat: this.currentOrder.priceExVat,
+        vatAmount: this.currentOrder.vatAmount,
+        totalPrice: this.currentOrder.totalPrice,
+        customer: customerDetails
+      };
+
       const response = await fetch(`${this.apiBaseUrl}/create-fiken-invoice`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          packageName: this.currentOrder.packageName,
-          price: this.currentOrder.price,
-          customerDetails,
-        }),
+        body: JSON.stringify(orderData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create invoice');
+        const errorText = await response.text();
+        throw new Error(`Failed to create invoice: ${errorText}`);
       }
 
       const data = await response.json();
