@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prisliste - Smarte Sider</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <script src="/js/menu.js" defer></script>
+    <script src="/js/app.js" defer></script>
+    <script src="/js/order.js" defer></script>
+</head>
+<body>
+    <h1>Prisliste</h1>
+    <div class="package">
+        <h2>Standard bedrift</h2>
+        <p>Pris: 9990 NOK</p>
+        <button class="order-button" data-package="Standard bedrift" data-price="9990">Bestill nå</button>
+    </div>
+    <div class="package">
+        <h2>Premium bedrift</h2>
+        <p>Pris: 14990 NOK</p>
+        <button class="order-button" data-package="Premium bedrift" data-price="14990">Bestill nå</button>
+    </div>
+    <!-- Add more packages as needed -->
+
+    <!-- Order Modal -->
+    <div id="order-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Fullfør din bestilling</h2>
+            <p id="order-summary"></p>
+            <form id="order-form">
+                <label for="full-name">Full Name:</label>
+                <input type="text" id="full-name" required>
+                <label for="company-name">Company Name:</label>
+                <input type="text" id="company-name" required>
+                <label for="organization-number">Organization Number:</label>
+                <input type="text" id="organization-number" required>
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+                <button type="button" id="pay-with-stripe">Betal med kort</button>
+                <button type="button" id="request-invoice">Send faktura</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript to handle modal display and order processing will be in order.js
+    </script>
+</body>
+</html>
